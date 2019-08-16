@@ -34,7 +34,7 @@ public class UltimateCars extends JavaPlugin {
 		loadConfigFile();
 		loadVehiclesFile();
 
-		getServer().getPluginManager().registerEvents(new CarPlacementListener(), this);
+		getServer().getPluginManager().registerEvents(new CarController(), this);
 		
 		getCommand("cars").setExecutor(new UltimateCarsCommandExecutor());
 

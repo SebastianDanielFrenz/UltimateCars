@@ -4,18 +4,21 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleUpdateEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 import org.json.simple.JSONObject;
 
-public class CarPlacementListener implements Listener {
+public class CarController implements Listener {
 
-	public CarPlacementListener() {
+	public CarController() {
 	}
 
 	@EventHandler
@@ -59,6 +62,33 @@ public class CarPlacementListener implements Listener {
 			player.sendMessage(Values.prefix + Values.error_invalid_vehicle_type);
 		}
 		UltimateCars.saveVehiclesFile();
+	}
+
+	@EventHandler
+	public void onMoveMinecart(VehicleUpdateEvent event) {
+		JSONObject car = CarManager.getCar(event.getVehicle().getEntityId());
+
+		if (car == null) {
+			return;
+		}
+
+		if (event.getVehicle().getPassengers().size() == 0) {
+			return;
+		}
+
+		// assuming only players can drive cars
+
+		Minecart minecart = (Minecart) event.getVehicle();
+		Player player = (Player) minecart.getPassengers().get(0);
+		Vector direction = player.getLocation().getDirection();
+
+		direction.setY(0);
+		double total = Math.sqrt(direction.getX() * direction.getX() + direction.getZ() * direction.getZ());
+
+		direction.setX(1 / total * direction.getX());
+		direction.setZ(1 / total * direction.getZ());
+
+		minecart.setVelocity(direction.multiply(10));
 	}
 
 	@EventHandler

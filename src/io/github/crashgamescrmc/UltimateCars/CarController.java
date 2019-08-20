@@ -1,8 +1,5 @@
 package io.github.crashgamescrmc.UltimateCars;
 
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -10,11 +7,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
-import org.bukkit.event.vehicle.VehicleUpdateEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-import org.json.simple.JSONObject;
 
 public class CarController implements Listener {
 
@@ -51,9 +46,12 @@ public class CarController implements Listener {
 			return;
 		}
 
-		if (car.getItemMeta().getLore().contains("Vehicle: Car")) {
+		if (Car.isItemCar(car)) {
 			if (car.getItemMeta().getLore().contains("owner: " + player.getUniqueId())) {
+
 				CarManager.addCar(player, event.getClickedBlock().getLocation());
+				player.getInventory().setItemInMainHand(null);
+
 				player.sendMessage(Values.prefix + Values.car_spawned);
 			} else {
 				player.sendMessage(Values.prefix + Values.car_does_not_belong_to_you);
@@ -61,46 +59,16 @@ public class CarController implements Listener {
 		} else {
 			player.sendMessage(Values.prefix + Values.error_invalid_vehicle_type);
 		}
-		UltimateCars.saveVehiclesFile();
-	}
-
-	@EventHandler
-	public void onMoveMinecart(VehicleUpdateEvent event) {
-		JSONObject car = CarManager.getCar(event.getVehicle().getEntityId());
-
-		if (car == null) {
-			return;
-		}
-
-		if (event.getVehicle().getPassengers().size() == 0) {
-			return;
-		}
-
-		// assuming only players can drive cars
-
-		Minecart minecart = (Minecart) event.getVehicle();
-		Player player = (Player) minecart.getPassengers().get(0);
-		Vector direction = player.getLocation().getDirection();
-
-		direction.setY(0);
-		double total = Math.sqrt(direction.getX() * direction.getX() + direction.getZ() * direction.getZ());
-
-		direction.setX(1 / total * direction.getX());
-		direction.setZ(1 / total * direction.getZ());
-
-		minecart.setVelocity(direction.multiply(10));
 	}
 
 	@EventHandler
 	public void onDestroyMinecart(VehicleDestroyEvent event) {
 
-		JSONObject car = CarManager.getCar(event.getVehicle().getEntityId());
-
-		if (car == null) {
+		if (!Car.isCar((Minecart) event.getVehicle())) {
 			return;
 		}
 
-		Player owner = Bukkit.getPlayer(UUID.fromString((String) car.get("owner")));
+		Player owner = Car.getOwner((Minecart) event.getVehicle());
 
 		if (event.getAttacker() == null) {
 
@@ -112,7 +80,7 @@ public class CarController implements Listener {
 
 			Player player = (Player) event.getAttacker();
 
-			if (player.getUniqueId().equals(UUID.fromString((String) car.get("owner")))) {
+			if (player.getUniqueId().equals(Car.getOwnerUUID((Minecart) event.getVehicle()))) {
 
 				player.sendMessage(Values.prefix + Values.car_destroyed_by_owner);
 			} else {
@@ -121,9 +89,5 @@ public class CarController implements Listener {
 				return;
 			}
 		}
-
-		CarManager.stashCar(event.getVehicle().getEntityId());
-
-		UltimateCars.saveVehiclesFile();
 	}
 }

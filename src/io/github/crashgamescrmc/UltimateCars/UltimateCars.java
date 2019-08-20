@@ -69,7 +69,7 @@ public class UltimateCars extends JavaPlugin {
 								Player player = (Player) minecart.getPassengers().get(0);
 								Vector direction = player.getLocation().getDirection();
 
-								direction.setY(0);
+								direction.setY(direction.getY());
 								double total = Math.sqrt(
 										direction.getX() * direction.getX() + direction.getZ() * direction.getZ());
 
@@ -77,6 +77,23 @@ public class UltimateCars extends JavaPlugin {
 								direction.setZ(1 / total * direction.getZ());
 
 								minecart.setVelocity(direction.multiply(10 * steering.c()));
+
+								if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(-0.25, 0, 0))
+										.isPassable()) {
+									minecart.teleport(minecart.getLocation().add(-0.25, 0, 0));
+								} else if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(0.25, 0, 0))
+										.isPassable()) {
+									minecart.teleport(minecart.getLocation().add(0.25, 0, 0));
+								} else if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(0, 0, -0.25))
+										.isPassable()) {
+									minecart.teleport(minecart.getLocation().add(0, 0, -0.25));
+								} else if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(0, 0, 0.25))
+										.isPassable()) {
+									minecart.teleport(minecart.getLocation().add(0, 0, 0.25));
+								} else if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(0, 0, 0))
+										.isPassable()) {
+									minecart.teleport(minecart.getLocation().add(0, 0, 0));
+								}
 							}
 						}
 					}

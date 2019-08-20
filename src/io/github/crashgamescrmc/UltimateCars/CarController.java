@@ -7,11 +7,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class CarController implements Listener {
+
+	public static Vector Drag(double density, Vector speed, double coefficient, double area) {
+		return speed.multiply(0.5 * density * coefficient * area).multiply(speed);
+	}
 
 	public CarController() {
 	}
@@ -59,6 +64,28 @@ public class CarController implements Listener {
 		} else {
 			player.sendMessage(Values.prefix + Values.error_invalid_vehicle_type);
 		}
+	}
+
+	@EventHandler
+	public void onVehicleMovement(VehicleMoveEvent event) {
+
+		Minecart minecart = (Minecart) event.getVehicle();
+
+		if (!Car.isCar(minecart)) {
+			return;
+		}
+
+		Vector velocity = minecart.getVelocity();
+
+		Vector drag_force = Drag(1.225, velocity, 1, 0.5);
+
+		double mass = 500;
+
+		Vector drag_acceleration = drag_force.divide(new Vector(mass, mass, mass));
+
+		velocity.subtract(drag_acceleration);
+
+		minecart.setVelocity(velocity);
 	}
 
 	@EventHandler

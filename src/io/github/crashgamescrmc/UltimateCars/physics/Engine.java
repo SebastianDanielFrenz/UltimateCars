@@ -2,12 +2,10 @@ package io.github.crashgamescrmc.UltimateCars.physics;
 
 public class Engine {
 
-	public Engine(PistonForceGraph torqueGraph, double engine_resistance, double piston_turn_radius,
-			double cubic_capacity) {
+	public Engine(PistonForceGraph torqueGraph, double engine_resistance, double piston_turn_radius) {
 		setTorqueGraph(torqueGraph);
 		setEngine_resistance(engine_resistance);
 		setPiston_turn_radius(piston_turn_radius);
-		setCubic_capacity(cubic_capacity);
 	}
 
 	private PistonForceGraph torqueGraph;
@@ -20,11 +18,9 @@ public class Engine {
 
 	private double current_rpm = 0;
 
-	private double cubic_capacity;
-
 	public void Update(double time) {
-		double force = current_rpm / 60 / piston_turn_radius;
-		double engine_resistance = engine_resistance_coefficient * cubic_capacity * 
+		double engine_force = current_rpm / 60 / piston_turn_radius;
+		
 	}
 
 	public double getPower(double rpm) {

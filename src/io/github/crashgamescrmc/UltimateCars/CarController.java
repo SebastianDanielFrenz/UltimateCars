@@ -75,7 +75,7 @@ public class CarController implements Listener {
 			return;
 		}
 
-		Vector velocity = minecart.getVelocity();
+		Vector velocity = minecart.getLocation().getDirection().multiply(Car.getSpeed(minecart));
 
 		Vector drag_force = Drag(1.225, velocity, 1, 0.5);
 
@@ -86,6 +86,8 @@ public class CarController implements Listener {
 		velocity.subtract(drag_acceleration);
 
 		minecart.setVelocity(velocity);
+
+		Car.setSpeed(minecart, velocity.length());
 	}
 
 	@EventHandler

@@ -76,7 +76,9 @@ public class UltimateCars extends JavaPlugin {
 								direction.setX(1 / total * direction.getX());
 								direction.setZ(1 / total * direction.getZ());
 
-								minecart.setVelocity(direction.multiply(10 * steering.c()));
+								Car.setSpeed(minecart, Car.getSpeed(minecart) + steering.c() * 0.25);
+
+								minecart.setVelocity(direction.multiply(Car.getSpeed(minecart)));
 
 								if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(-0.25, 0, 0))
 										.isPassable()) {

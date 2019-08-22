@@ -7,16 +7,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
-import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 public class CarController implements Listener {
-
-	public static Vector Drag(double density, Vector speed, double coefficient, double area) {
-		return speed.multiply(0.5 * density * coefficient * area).multiply(speed);
-	}
 
 	public CarController() {
 	}
@@ -67,31 +62,39 @@ public class CarController implements Listener {
 	}
 
 	@EventHandler
-	public void onVehicleMovement(VehicleMoveEvent event) {
+	public void onDestroyMinecart(VehicleDestroyEvent event) {
 
-		Minecart minecart = (Minecart) event.getVehicle();
-
-		if (!Car.isCar(minecart)) {
+		if (!Car.isCar((Minecart) event.getVehicle())) {
 			return;
 		}
 
-		Vector velocity = minecart.getLocation().getDirection().multiply(Car.getSpeed(minecart));
+		Player owner = Car.getOwner((Minecart) event.getVehicle());
 
-		Vector drag_force = Drag(1.225, velocity, 1, 0.5);
+		if (event.getAttacker() == null) {
 
-		double mass = 500;
+			owner.sendMessage(Values.prefix + Values.car_destroyed_by_environment);
+			return;
+		}
 
-		Vector drag_acceleration = drag_force.divide(new Vector(mass, mass, mass));
+		if (event.getAttacker() instanceof Player) {
 
-		velocity.subtract(drag_acceleration);
+			Player player = (Player) event.getAttacker();
 
-		minecart.setVelocity(velocity);
+			if (player.getUniqueId().equals(Car.getOwnerUUID((Minecart) event.getVehicle()))) {
 
-		Car.setSpeed(minecart, velocity.length());
+				player.sendMessage(Values.prefix + Values.car_destroyed_by_owner);
+			} else {
+
+				event.setCancelled(true);
+				return;
+			}
+		}
+
+		CarManager.stashCar((Minecart) event.getVehicle());
 	}
 
 	@EventHandler
-	public void onDestroyMinecart(VehicleDestroyEvent event) {
+	public void onDamageMinecart(VehicleDamageEvent event) {
 
 		if (!Car.isCar((Minecart) event.getVehicle())) {
 			return;

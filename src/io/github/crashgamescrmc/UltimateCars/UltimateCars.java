@@ -33,7 +33,7 @@ public class UltimateCars extends JavaPlugin {
 	public static Economy economy;
 	public static ProtocolManager protocolManager;
 
-	public static final String version = "0.0.3";
+	public static final String version = "0.0.2";
 	public static final long build = 1;
 
 	@Override
@@ -69,33 +69,14 @@ public class UltimateCars extends JavaPlugin {
 								Player player = (Player) minecart.getPassengers().get(0);
 								Vector direction = player.getLocation().getDirection();
 
-								direction.setY(direction.getY());
+								direction.setY(0);
 								double total = Math.sqrt(
 										direction.getX() * direction.getX() + direction.getZ() * direction.getZ());
 
 								direction.setX(1 / total * direction.getX());
 								direction.setZ(1 / total * direction.getZ());
 
-								Car.setSpeed(minecart, Car.getSpeed(minecart) + steering.c() * 0.25);
-
-								minecart.setVelocity(direction.multiply(Car.getSpeed(minecart)));
-
-								if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(-0.25, 0, 0))
-										.isPassable()) {
-									minecart.teleport(minecart.getLocation().add(-0.25, 0, 0));
-								} else if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(0.25, 0, 0))
-										.isPassable()) {
-									minecart.teleport(minecart.getLocation().add(0.25, 0, 0));
-								} else if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(0, 0, -0.25))
-										.isPassable()) {
-									minecart.teleport(minecart.getLocation().add(0, 0, -0.25));
-								} else if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(0, 0, 0.25))
-										.isPassable()) {
-									minecart.teleport(minecart.getLocation().add(0, 0, 0.25));
-								} else if (!minecart.getWorld().getBlockAt(minecart.getLocation().add(0, 0, 0))
-										.isPassable()) {
-									minecart.teleport(minecart.getLocation().add(0, 0, 0));
-								}
+								minecart.setVelocity(direction.multiply(10 * steering.c()));
 							}
 						}
 					}
@@ -126,7 +107,6 @@ public class UltimateCars extends JavaPlugin {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void loadConfigFile() {
 		File dir = new File("plugins/UltimateCars");
 		if (!dir.exists()) {
@@ -139,13 +119,6 @@ public class UltimateCars extends JavaPlugin {
 			try {
 				config = (JSONObject) parser.parse(fw);
 				fw.close();
-
-				if (Utils.isSmaller((String) config.get("version"), (long) config.get("build"), version, build)) {
-
-					JSONObject car = new JSONObject();
-					car.put("speed", 10);
-					config.put("car", car);
-				}
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

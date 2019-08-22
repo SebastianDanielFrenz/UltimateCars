@@ -1,5 +1,5 @@
 name: UltimateCars
-version: 0.0.3_01
+version: 0.0.2_01
 author: CrashGamesCrMc
 main: io.github.crashgamescrmc.UltimateCars.UltimateCars
 description: A minecraft plugin that turns off rail minecarts into cars.

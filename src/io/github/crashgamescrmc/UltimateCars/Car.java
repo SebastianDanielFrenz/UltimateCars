@@ -14,7 +14,6 @@ public class Car {
 	public static void setTags(Minecart minecart, UUID owner) {
 		minecart.addScoreboardTag("UltimateCars_Vehicle: Car");
 		minecart.addScoreboardTag("UltimateCars_Owner: " + owner.toString());
-		minecart.addScoreboardTag("UltimateCars_Speed: 0.0");
 	}
 
 	public static void setTags(Minecart minecart, OfflinePlayer owner) {
@@ -50,27 +49,6 @@ public class Car {
 			return true;
 		}
 		return false;
-	}
-
-	public static double getSpeed(Minecart minecart) {
-		for (String tag : minecart.getScoreboardTags()) {
-			if (tag.startsWith("UltimateCars_Speed: ")) {
-				return Double.parseDouble(tag.substring(20));
-			}
-		}
-
-		return Double.NaN;
-	}
-
-	public static void setSpeed(Minecart minecart, double speed) {
-		for (String tag : minecart.getScoreboardTags()) {
-			if (tag.startsWith("UltimateCars_Speed: ")) {
-				minecart.removeScoreboardTag(tag);
-				break;
-			}
-		}
-
-		minecart.addScoreboardTag("UltimateCars_Speed: " + String.valueOf(speed));
 	}
 
 }

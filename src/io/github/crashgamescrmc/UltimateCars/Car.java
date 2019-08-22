@@ -11,13 +11,15 @@ import org.bukkit.inventory.ItemStack;
 
 public class Car {
 
-	public static void setTags(Minecart minecart, UUID owner) {
+	public static void setTags(Minecart minecart, UUID owner, double maxSpeed) {
 		minecart.addScoreboardTag("UltimateCars_Vehicle: Car");
 		minecart.addScoreboardTag("UltimateCars_Owner: " + owner.toString());
+		minecart.addScoreboardTag("UltimateCars_Speed: " + 0.0);
+		minecart.addScoreboardTag("UltimateCars_MaxSpeed: " + maxSpeed);
 	}
 
-	public static void setTags(Minecart minecart, OfflinePlayer owner) {
-		setTags(minecart, owner.getUniqueId());
+	public static void setTags(Minecart minecart, OfflinePlayer owner, double maxSpeed) {
+		setTags(minecart, owner.getUniqueId(), maxSpeed);
 	}
 
 	public static UUID getOwnerUUID(Minecart minecart) {
@@ -49,6 +51,66 @@ public class Car {
 			return true;
 		}
 		return false;
+	}
+
+	public static double getSpeed(Minecart car) {
+		String speed = getSpeedRaw(car);
+		if (speed == null) {
+			return Double.NaN;
+		}
+		return Double.parseDouble(speed);
+	}
+
+	public static String getSpeedRaw(Minecart car) {
+		for (String tag : car.getScoreboardTags()) {
+			if (tag.startsWith("UltimateCars_Speed: ")) {
+				return tag.substring(20);
+			}
+		}
+		return null;
+	}
+
+	public static void setSpeed(Minecart car, double speed) {
+		car.removeScoreboardTag("UltimateCars_Speed: " + getSpeedRaw(car));
+
+		car.addScoreboardTag("UltimateCars_Speed: " + speed);
+	}
+
+	public static String getMaxSpeedRaw(Minecart car) {
+		for (String tag : car.getScoreboardTags()) {
+			if (tag.startsWith("UltimateCars_MaxSpeed: ")) {
+				return tag.substring(23);
+			}
+		}
+		return null;
+	}
+
+	public static double getMaxSpeed(Minecart car) {
+		String speed = getMaxSpeedRaw(car);
+		if (speed == null) {
+			return Double.NaN;
+		} else {
+			return Double.parseDouble(speed);
+		}
+	}
+
+	public static void setMaxSpeed(Minecart car, double speed) {
+		car.removeScoreboardTag("UltimateCars_MaxSpeed: " + getMaxSpeed(car));
+
+		car.addScoreboardTag("UltimateCars_MaxSpeed: " + speed);
+	}
+
+	public static double getMaxSpeed(ItemStack car) {
+		for (String line : car.getItemMeta().getLore()) {
+			if (line.startsWith("speed: ")) {
+				return Double.parseDouble(line.substring(7));
+			}
+		}
+		return Double.NaN;
+	}
+
+	public static boolean hasMaxSpeed(ItemStack car) {
+		return getMaxSpeed(car) != Double.NaN;
 	}
 
 }

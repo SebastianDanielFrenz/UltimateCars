@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,9 +46,17 @@ public class CarController implements Listener {
 		}
 
 		if (Car.isItemCar(car)) {
+
+			double speed;
+			if (!Car.hasMaxSpeed(car)) {
+				speed = UltimateCars.getCarDefaultSpeed();
+			} else {
+				speed = Car.getMaxSpeed(car);
+			}
+
 			if (car.getItemMeta().getLore().contains("owner: " + player.getUniqueId())) {
 
-				CarManager.addCar(player, event.getClickedBlock().getLocation());
+				CarManager.addCar(player, event.getClickedBlock().getLocation(), speed);
 				player.getInventory().setItemInMainHand(null);
 
 				player.sendMessage(Values.prefix + Values.car_spawned);
@@ -91,35 +98,5 @@ public class CarController implements Listener {
 		}
 
 		CarManager.stashCar((Minecart) event.getVehicle());
-	}
-
-	@EventHandler
-	public void onDamageMinecart(VehicleDamageEvent event) {
-
-		if (!Car.isCar((Minecart) event.getVehicle())) {
-			return;
-		}
-
-		Player owner = Car.getOwner((Minecart) event.getVehicle());
-
-		if (event.getAttacker() == null) {
-
-			owner.sendMessage(Values.prefix + Values.car_destroyed_by_environment);
-			return;
-		}
-
-		if (event.getAttacker() instanceof Player) {
-
-			Player player = (Player) event.getAttacker();
-
-			if (player.getUniqueId().equals(Car.getOwnerUUID((Minecart) event.getVehicle()))) {
-
-				player.sendMessage(Values.prefix + Values.car_destroyed_by_owner);
-			} else {
-
-				event.setCancelled(true);
-				return;
-			}
-		}
 	}
 }

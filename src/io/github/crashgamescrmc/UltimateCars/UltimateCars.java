@@ -33,7 +33,7 @@ public class UltimateCars extends JavaPlugin {
 	public static Economy economy;
 	public static ProtocolManager protocolManager;
 
-	public static final String version = "0.0.2";
+	public static final String version = "0.0.3";
 	public static final long build = 1;
 
 	@Override
@@ -69,14 +69,17 @@ public class UltimateCars extends JavaPlugin {
 								Player player = (Player) minecart.getPassengers().get(0);
 								Vector direction = player.getLocation().getDirection();
 
+								double y = minecart.getVelocity().getY();
+
 								direction.setY(0);
+
 								double total = Math.sqrt(
 										direction.getX() * direction.getX() + direction.getZ() * direction.getZ());
 
 								direction.setX(1 / total * direction.getX());
 								direction.setZ(1 / total * direction.getZ());
 
-								minecart.setVelocity(direction.multiply(10 * steering.c()));
+								minecart.setVelocity(direction.multiply(10 * steering.c()).setY(y));
 							}
 						}
 					}
@@ -107,6 +110,7 @@ public class UltimateCars extends JavaPlugin {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void loadConfigFile() {
 		File dir = new File("plugins/UltimateCars");
 		if (!dir.exists()) {
@@ -119,6 +123,21 @@ public class UltimateCars extends JavaPlugin {
 			try {
 				config = (JSONObject) parser.parse(fw);
 				fw.close();
+
+				if (Utils.isSmaller((String) config.get("version"), (long) config.get("build"), version, build)) {
+					JSONObject car = new JSONObject();
+
+					car.put("default_speed", 5.0);
+					car.put("upgrade_speed", 2.5);
+					car.put("upgrade_base_cost", 10);
+					car.put("upgrade_multiplier_cost", 1.5);
+					car.put("purchase_cost", 100);
+					car.put("max_speed", 100.0);
+
+					config.put("car", car);
+
+					plugin.getLogger().info("Adapted config for " + version + "_" + build);
+				}
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -136,6 +155,17 @@ public class UltimateCars extends JavaPlugin {
 	public static void resetConfigData() {
 		config.clear();
 
+		JSONObject car = new JSONObject();
+
+		car.put("default_speed", 5.0);
+		car.put("upgrade_speed", 2.5);
+		car.put("upgrade_base_cost", 10);
+		car.put("upgrade_multiplier_cost", 1.5);
+		car.put("purchase_cost", 100);
+		car.put("max_speed", 100.0);
+
+		config.put("car", car);
+
 		config.put("version", version);
 		config.put("build", build);
 	}
@@ -148,6 +178,64 @@ public class UltimateCars extends JavaPlugin {
 		}
 
 		return economy != null;
+	}
+
+	public static JSONObject getCarConfig() {
+		return (JSONObject) config.get("car");
+	}
+
+	public static double getCarDefaultSpeed() {
+		return (double) getCarConfig().get("default_speed");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void setCarDefaultSpeed(double speed) {
+		getCarConfig().put("default_speed", speed);
+	}
+
+	public static double getCarUpgradeSpeed() {
+		return (double) getCarConfig().get("upgrade_speed");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void setCarUpgradeSpeed(double speed) {
+		getCarConfig().put("upgrade_speed", speed);
+	}
+
+	public static double getCarUpgradeBaseCost() {
+		return (double) getCarConfig().get("upgrade_base_cost");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void setCarUpgradeBaseCost(double cost) {
+		getCarConfig().put("upgrade_base_cost", cost);
+	}
+
+	public static double getCarUpgradeMultiplierCost() {
+		return (double) getCarConfig().get("upgrade_multiplier_cost");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void setCarUpgradeMultiplierCost(double cost) {
+		getCarConfig().put("upgrade_multiplier_cost", cost);
+	}
+
+	public static double getCarPurchaseCost() {
+		return (double) getCarConfig().get("purchase_cost");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void setCarPurchaseCost(double cost) {
+		getCarConfig().put("purchase_cost", cost);
+	}
+
+	public static double getCarMaxSpeed() {
+		return (double) getCarConfig().get("max_speed");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void setCarMaxSpeed(double speed) {
+		getCarConfig().put("max_speed", speed);
 	}
 
 }

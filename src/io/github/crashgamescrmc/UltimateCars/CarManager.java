@@ -14,13 +14,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class CarManager {
 
-	public static void addCar(OfflinePlayer owner, Location location) {
+	public static void addCar(OfflinePlayer owner, Location location, double maxSpeed) {
 
 		location.add(0, 1, 0);
 
 		Minecart minecart = location.getWorld().spawn(location, Minecart.class);
 
-		Car.setTags(minecart, owner);
+		Car.setTags(minecart, owner, maxSpeed);
 
 	}
 
@@ -34,6 +34,7 @@ public class CarManager {
 
 		lore.add("Vehicle: Car");
 		lore.add("owner: " + player.getUniqueId());
+		lore.add("speed: " + Car.getMaxSpeed(minecart));
 
 		meta.setLore(lore);
 		car.setItemMeta(meta);
@@ -43,7 +44,7 @@ public class CarManager {
 		minecart.remove();
 	}
 
-	public static void buyCar(Player player) {
+	public static void buyCar(Player player, double price, double maxSpeed) {
 
 		ItemStack car = new ItemStack(Material.MINECART);
 		ItemMeta meta = car.getItemMeta();
@@ -51,13 +52,14 @@ public class CarManager {
 
 		lore.add("Vehicle: Car");
 		lore.add("owner: " + player.getUniqueId());
+		lore.add("speed: " + maxSpeed);
 
 		meta.setLore(lore);
 		car.setItemMeta(meta);
 
 		player.getInventory().addItem(car);
 
-		UltimateCars.economy.withdrawPlayer(player, 100);
+		UltimateCars.economy.withdrawPlayer(player, price);
 	}
 
 }

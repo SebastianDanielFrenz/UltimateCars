@@ -21,8 +21,8 @@ public class UltimateCarsCommandExecutor implements CommandExecutor {
 						sender.sendMessage(Values.prefix + Values.error_not_enough_money);
 						return true;
 					}
-					CarManager.buyCar((Player) sender);
-					UltimateCars.economy.withdrawPlayer((Player) sender, 1000);
+					CarManager.buyCar((Player) sender, UltimateCars.getCarPurchaseCost(),
+							UltimateCars.getCarDefaultSpeed());
 					return true;
 				} else {
 					sender.sendMessage(Values.prefix + Values.error_not_a_player);

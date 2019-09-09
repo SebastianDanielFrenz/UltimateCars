@@ -8,7 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class CarController implements Listener {
 
@@ -98,5 +100,34 @@ public class CarController implements Listener {
 		}
 
 		CarManager.stashCar((Minecart) event.getVehicle());
+		event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onCarMove(VehicleMoveEvent event) {
+
+		Minecart car = (Minecart) event.getVehicle();
+		if (!Car.isCar(car)) {
+			return;
+		}
+
+		Player player = (Player) car.getPassengers().get(0);
+		Vector direction = player.getLocation().getDirection();
+
+		direction.setY(0);
+
+		double total = Math.sqrt(direction.getX() * direction.getX() + direction.getZ() * direction.getZ());
+
+		direction.setX(1 / total * direction.getX());
+		direction.setZ(1 / total * direction.getZ());
+
+		car.getLocation().setDirection(direction);
+
+		direction.setY(car.getVelocity().getY());
+
+		direction.setX(1 / total * direction.getX() * Car.getSpeed(car));
+		direction.setZ(1 / total * direction.getZ() * Car.getSpeed(car));
+
+		car.setVelocity(direction);
 	}
 }

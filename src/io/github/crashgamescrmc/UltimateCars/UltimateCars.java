@@ -7,10 +7,8 @@ import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -34,7 +32,7 @@ public class UltimateCars extends JavaPlugin {
 	public static ProtocolManager protocolManager;
 
 	public static final String version = "0.0.3";
-	public static final long build = 1;
+	public static final long build = 2;
 
 	@Override
 	public void onEnable() {
@@ -64,22 +62,14 @@ public class UltimateCars extends JavaPlugin {
 									return;
 								}
 
-								// assuming only players can drive cars
-
-								Player player = (Player) minecart.getPassengers().get(0);
-								Vector direction = player.getLocation().getDirection();
-
-								double y = minecart.getVelocity().getY();
-
-								direction.setY(0);
-
-								double total = Math.sqrt(
-										direction.getX() * direction.getX() + direction.getZ() * direction.getZ());
-
-								direction.setX(1 / total * direction.getX());
-								direction.setZ(1 / total * direction.getZ());
-
-								minecart.setVelocity(direction.multiply(10 * steering.c()).setY(y));
+								if (steering.c() > 0 && Car.getSpeed(minecart) >= Car.getMaxSpeed(minecart)) {
+									Car.setSpeed(minecart, Car.getMaxSpeed(minecart));
+								} else if (steering.c() < 0 && Car.getSpeed(minecart) <= -Car.getMaxSpeed(minecart)) {
+									Car.setSpeed(minecart, -Car.getMaxSpeed(minecart));
+								} else {
+									double acc_ticks = 20 * 5;
+									Car.setSpeed(minecart, Car.getSpeed(minecart) + steering.c() / acc_ticks);
+								}
 							}
 						}
 					}
